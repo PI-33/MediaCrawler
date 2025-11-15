@@ -100,7 +100,6 @@ class XiaoHongShuCrawler(AbstractCrawler):
 
             crawler_type_var.set(config.CRAWLER_TYPE)
             if config.CRAWLER_TYPE == "search":
-                # Search for notes and retrieve their comment information.
                 await self.search()
             elif config.CRAWLER_TYPE == "detail":
                 # Get the information and comments of the specified post
@@ -135,11 +134,20 @@ class XiaoHongShuCrawler(AbstractCrawler):
                     utils.logger.info(f"[XiaoHongShuCrawler.search] search xhs keyword: {keyword}, page: {page}")
                     note_ids: List[str] = []
                     xsec_tokens: List[str] = []
+                    filters = [
+                        {"tags": [config.xhs_config.FILTER_VALUES["sort_type"]], "type": "sort_type"},
+                        {"tags": [config.xhs_config.FILTER_VALUES["filter_note_type"]], "type": "filter_note_type"},
+                        {"tags": [config.xhs_config.FILTER_VALUES["filter_note_time"]], "type": "filter_note_time"},
+                        {"tags": [config.xhs_config.FILTER_VALUES["filter_note_range"]], "type": "filter_note_range"},
+                        {"tags": [config.xhs_config.FILTER_VALUES["filter_pos_distance"]], "type": "filter_pos_distance"},
+                    ]
+                    print(f"[XiaoHongShuCrawler.search] filters: {filters}")
                     notes_res = await self.xhs_client.get_note_by_keyword(
                         keyword=keyword,
                         search_id=search_id,
                         page=page,
                         sort=(SearchSortType(config.SORT_TYPE) if config.SORT_TYPE != "" else SearchSortType.GENERAL),
+                        filters=filters,
                     )
                     utils.logger.info(f"[XiaoHongShuCrawler.search] Search notes res:{notes_res}")
                     if not notes_res or not notes_res.get("has_more", False):

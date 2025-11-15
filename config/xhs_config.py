@@ -9,11 +9,58 @@
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
 # 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
 
+import os
+import sys
 
 # 小红书平台配置
 
-# 排序方式，具体的枚举值在media_platform/xhs/field.py中
-SORT_TYPE = "popularity_descending"
+DEFAULT_SORT_TYPE = "popularity_descending"
+
+def _get_cli_arg(name: str) -> str:
+    try:
+        argv = sys.argv
+        for i, arg in enumerate(argv):
+            if arg == f"--{name}" and i + 1 < len(argv):
+                val = argv[i + 1]
+                if not val.startswith("-"):
+                    return val
+        return ""
+    except Exception:
+        return ""
+
+_sort_map = {
+    "0": "general",
+    "1": "popularity_descending",
+    "2": "time_descending",
+    "3": "comment_descending",
+    "4": "collect_descending",
+}
+
+_note_type_map = {
+    "0": "不限",
+    "1": "视频笔记",
+    "2": "普通笔记",
+}
+
+_note_time_map = {
+    "0": "一天内",
+    "1": "一周内",
+    "2": "半年内",
+}
+
+_raw_sort = _get_cli_arg("sort_type").strip()
+_raw_note_type = _get_cli_arg("filter_note_type").strip()
+_raw_note_time = _get_cli_arg("filter_note_time").strip()
+
+SORT_TYPE = _sort_map.get(_raw_sort, DEFAULT_SORT_TYPE)
+
+FILTER_VALUES = {
+    "sort_type": SORT_TYPE,
+    "filter_note_type": _note_type_map.get(_raw_note_type, "不限"),
+    "filter_note_time": _note_time_map.get(_raw_note_time, "不限"),
+    "filter_note_range": "不限",
+    "filter_pos_distance": "不限",
+}
 
 # 指定笔记URL列表, 必须要携带xsec_token参数
 XHS_SPECIFIED_NOTE_URL_LIST = [

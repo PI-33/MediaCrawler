@@ -22,6 +22,7 @@ from typing_extensions import Annotated
 
 import config
 from tools.utils import str2bool
+from media_platform.xhs.field import SearchSortType, FilterNoteType, FilterNoteTime
 
 
 EnumT = TypeVar("EnumT", bound=Enum)
@@ -212,6 +213,46 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
                 rich_help_panel="账号配置",
             ),
         ] = config.COOKIES,
+        max_notes_count: Annotated[
+            Optional[int],
+            typer.Option(
+                "--max_notes_count",
+                help="每个平台爬取的最大帖子数量",
+                rich_help_panel="基础配置",
+            ),
+        ] = None,
+        max_comments_count_single_note: Annotated[
+            Optional[int],
+            typer.Option(
+                "--max_comments_count_single_note",
+                help="每条帖子爬取的一级评论数量",
+                rich_help_panel="评论配置",
+            ),
+        ] = None,
+        sort_type: Annotated[
+            str,
+            typer.Option(
+                "--sort_type",
+                help="排序类型 (0=默认, 1=最受欢迎, 2=最新, 3=最多评论, 4=最多收藏)",
+                rich_help_panel="小红书配置",
+            ),
+        ] = "",
+        filter_note_type: Annotated[
+            str,
+            typer.Option(
+                "--filter_note_type",
+                help="笔记类型过滤 (0=不限, 1=视频笔记, 2=普通笔记)",
+                rich_help_panel="小红书配置",
+            ),
+        ] = "",
+        filter_note_time: Annotated[
+            str,
+            typer.Option(
+                "--filter_note_time",
+                help="笔记时间过滤 (0=一天内, 1=一周内, 2=半年内)",
+                rich_help_panel="小红书配置",
+            ),
+        ] = "",
     ) -> SimpleNamespace:
         """MediaCrawler 命令行入口"""
 
@@ -229,6 +270,10 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
         config.ENABLE_GET_SUB_COMMENTS = enable_sub_comment
         config.SAVE_DATA_OPTION = save_data_option.value
         config.COOKIES = cookies
+        if max_notes_count is not None:
+            config.CRAWLER_MAX_NOTES_COUNT = int(max_notes_count)
+        if max_comments_count_single_note is not None:
+            config.CRAWLER_MAX_COMMENTS_COUNT_SINGLENOTES = int(max_comments_count_single_note)
 
         return SimpleNamespace(
             platform=config.PLATFORM,
@@ -241,6 +286,11 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
             save_data_option=config.SAVE_DATA_OPTION,
             init_db=init_db_value,
             cookies=config.COOKIES,
+            sort_type=sort_type,
+            filter_note_type=filter_note_type,
+            filter_note_time=filter_note_time,
+            max_notes_count=max_notes_count,
+            max_comments_count_single_note=max_comments_count_single_note,
         )
 
     command = typer.main.get_command(app)

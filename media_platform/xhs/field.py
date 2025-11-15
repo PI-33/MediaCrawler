@@ -51,6 +51,10 @@ class SearchSortType(Enum):
     MOST_POPULAR = "popularity_descending"
     # Latest
     LATEST = "time_descending"
+    # Most comments
+    MOST_COMMENTS = "comment_descending"
+    # Most collected
+    MOST_COLLECTED = "collect_descending"
 
 
 class SearchNoteType(Enum):
@@ -62,6 +66,25 @@ class SearchNoteType(Enum):
     VIDEO = 1
     # only image
     IMAGE = 2
+
+
+class FilterNoteType(Enum):
+    """笔记类型过滤器"""
+    UNLIMITED = "不限"
+    VIDEO_NOTE = "视频笔记"
+    NORMAL_NOTE = "普通笔记"
+
+
+class FilterNoteTime(Enum):
+    """笔记时间过滤器"""
+    ONE_DAY = "一天内"
+    ONE_WEEK = "一周内"
+    SIX_MONTHS = "半年内"
+
+
+class FilterRange(Enum):
+    """范围过滤器"""
+    UNLIMITED = "不限"
 
 
 class Note(NamedTuple):

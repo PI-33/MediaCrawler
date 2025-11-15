@@ -24,8 +24,14 @@ from media_platform.tieba import TieBaCrawler
 from media_platform.weibo import WeiboCrawler
 from media_platform.xhs import XiaoHongShuCrawler
 from media_platform.zhihu import ZhihuCrawler
+from tools import utils
 from tools.async_file_writer import AsyncFileWriter
-from var import crawler_type_var
+from var import crawler_type_var, startup_time_var
+
+
+# Global startup time captured at program initialization
+startup_time = utils.get_current_datetime_with_minutes()
+startup_time_var.set(startup_time)
 
 
 class CrawlerFactory:

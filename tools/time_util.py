@@ -48,6 +48,14 @@ def get_current_date() -> str:
     return time.strftime('%Y-%m-%d', time.localtime())
 
 
+def get_current_datetime_with_minutes() -> str:
+    """
+    获取当前的日期和时间（包含时分）：'2023-12-02-13-01'
+    :return:
+    """
+    return time.strftime('%Y-%m-%d-%H-%M', time.localtime())
+
+
 def get_time_str_from_unix_time(unixtime):
     """
     unix 整数类型时间戳  ==> 字符串日期时间

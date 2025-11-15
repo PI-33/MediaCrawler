@@ -244,6 +244,7 @@ class XiaoHongShuClient(AbstractApiClient):
         page_size: int = 20,
         sort: SearchSortType = SearchSortType.GENERAL,
         note_type: SearchNoteType = SearchNoteType.ALL,
+        filters: Optional[List[Dict]] = None,
     ) -> Dict:
         """
         根据关键词搜索笔记
@@ -265,7 +266,10 @@ class XiaoHongShuClient(AbstractApiClient):
             "search_id": search_id,
             "sort": sort.value,
             "note_type": note_type.value,
+            "filters": filters,
         }
+        print("[XiaoHongShuClient.get_note_by_keyword] request data:", data)
+
         return await self.post(uri, data)
 
     async def get_note_by_id(

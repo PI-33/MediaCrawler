@@ -8,6 +8,7 @@ import aiofiles
 import config
 from tools.utils import utils
 from tools.words import AsyncWordCloudGenerator
+from var import startup_time_var
 
 class AsyncFileWriter:
     def __init__(self, platform: str, crawler_type: str):
@@ -19,7 +20,9 @@ class AsyncFileWriter:
     def _get_file_path(self, file_type: str, item_type: str) -> str:
         base_path = f"data/{self.platform}/{file_type}"
         pathlib.Path(base_path).mkdir(parents=True, exist_ok=True)
-        file_name = f"{self.crawler_type}_{item_type}_{utils.get_current_date()}.{file_type}"
+        # file_name = f"{self.crawler_type}_{item_type}_{utils.get_current_date()}.{file_type}"
+        startup_time = startup_time_var.get()
+        file_name = f"{self.crawler_type}_{item_type}_{startup_time}.{file_type}"
         return f"{base_path}/{file_name}"
 
     async def write_to_csv(self, item: Dict, item_type: str):
