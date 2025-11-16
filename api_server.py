@@ -18,22 +18,21 @@ def find_latest_files(directory, pattern):
     return max(files, key=os.path.getmtime)
 
 
-def read_json_data_with_limit(file_path):
+def read_json_data(file_path):
     """
-    读取JSON文件数据并返回前N条记录
+    读取JSON文件全部数据
     
     Args:
         file_path (str): JSON文件路径
-        limit (int): 返回的最大记录数，默认为5
         
     Returns:
-        list: 包含前N条记录的列表，如果文件不存在或读取失败返回空列表
+        list: 包含全部记录的列表，如果文件不存在或读取失败返回空列表
     """
-    # 读取内容数据（前5条）
     if os.path.exists(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             all_data = json.load(f)
-            return all_data[:5]
+            return all_data
+    return []
     
 
 app = Flask(__name__)
@@ -104,8 +103,8 @@ def crawl():
             payload = stdout_text[start_idx + len("MC_JSON_START"):end_idx]
             try:
                 data_obj = json.loads(payload)
-                contents = data_obj.get("contents", [])[:5]
-                comments = data_obj.get("comments", [])[:5]
+                contents = data_obj.get("contents", [])
+                comments = data_obj.get("comments", [])
                 return jsonify({
                     "status": "success",
                     "platform": platform,
@@ -129,8 +128,8 @@ def crawl():
                 "status": "error", 
                 "message": "未找到评论数据文件，请确保爬虫已成功执行"
             }), 404
-        contents = read_json_data_with_limit(contents_file)
-        comments = read_json_data_with_limit(comments_file)
+        contents = read_json_data(contents_file)
+        comments = read_json_data(comments_file)
         return jsonify({
             "status": "success",
             "platform": platform,

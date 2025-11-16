@@ -13,7 +13,7 @@ import argparse
 import logging
 
 from .crawler_util import *
-from .slider_util import *
+# from .slider_util import *
 from .time_util import *
 
 
