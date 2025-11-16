@@ -6,6 +6,7 @@ import pathlib
 from typing import Dict, List
 import aiofiles
 import config
+from tools.result_collector import get_collector, is_memory_output
 from tools.utils import utils
 from tools.words import AsyncWordCloudGenerator
 from var import startup_time_var
@@ -26,6 +27,15 @@ class AsyncFileWriter:
         return f"{base_path}/{file_name}"
 
     async def write_to_csv(self, item: Dict, item_type: str):
+        if is_memory_output():
+            c = get_collector()
+            if item_type == 'contents':
+                c.add_content(item)
+            elif item_type == 'comments':
+                c.add_comment(item)
+            elif item_type == 'creators':
+                c.add_creator(item)
+            return
         file_path = self._get_file_path('csv', item_type)
         async with self.lock:
             file_exists = os.path.exists(file_path)
@@ -36,6 +46,15 @@ class AsyncFileWriter:
                 await writer.writerow(item)
 
     async def write_single_item_to_json(self, item: Dict, item_type: str):
+        if is_memory_output():
+            c = get_collector()
+            if item_type == 'contents':
+                c.add_content(item)
+            elif item_type == 'comments':
+                c.add_comment(item)
+            elif item_type == 'creators':
+                c.add_creator(item)
+            return
         file_path = self._get_file_path('json', item_type)
         async with self.lock:
             existing_data = []
@@ -49,9 +68,7 @@ class AsyncFileWriter:
                             existing_data = [existing_data]
                     except json.JSONDecodeError:
                         existing_data = []
-            
             existing_data.append(item)
-
             async with aiofiles.open(file_path, 'w', encoding='utf-8') as f:
                 await f.write(json.dumps(existing_data, ensure_ascii=False, indent=4))
 
@@ -60,6 +77,8 @@ class AsyncFileWriter:
         Generate wordcloud from comments data
         Only works when ENABLE_GET_WORDCLOUD and ENABLE_GET_COMMENTS are True
         """
+        if is_memory_output():
+            return
         if not config.ENABLE_GET_WORDCLOUD or not config.ENABLE_GET_COMMENTS:
             return
 

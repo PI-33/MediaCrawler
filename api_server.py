@@ -51,7 +51,7 @@ def crawl():
         max_comments_count_single = data.get('max_comments_count_single_note', '')
         
         # 执行爬虫命令，但不在API响应中返回控制台输出
-        cmd = [sys.executable, 'main.py', '--platform', platform, '--type', 'search']
+        cmd = [sys.executable, 'main.py', '--platform', platform, '--type', 'search', '--output', 'stdout', '--quiet']
         
         # 如果提供了cookies，则使用cookie登录方式
         if cookies:
@@ -84,11 +84,8 @@ def crawl():
             timeout=600  # 10分钟超时
         )
         
-        # 在终端显示控制台输出（但不在API响应中返回）
         print("=== 爬虫执行输出 ===")
         print("返回码:", result.returncode)
-        if result.stdout:
-            print("标准输出:", result.stdout)
         if result.stderr:
             print("错误输出:", result.stderr)
         print("===================")
@@ -100,36 +97,40 @@ def crawl():
                 "error_code": result.returncode
             }), 500
         
-        # 读取生成的JSON文件并返回前5条数据
-        # 查找目录中最新的文件，避免跨进程变量不一致问题
+        stdout_text = result.stdout or ""
+        start_idx = stdout_text.find("MC_JSON_START")
+        end_idx = stdout_text.find("MC_JSON_END")
+        if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+            payload = stdout_text[start_idx + len("MC_JSON_START"):end_idx]
+            try:
+                data_obj = json.loads(payload)
+                contents = data_obj.get("contents", [])[:5]
+                comments = data_obj.get("comments", [])[:5]
+                return jsonify({
+                    "status": "success",
+                    "platform": platform,
+                    "data": {
+                        "contents": contents,
+                        "comments": comments
+                    }
+                })
+            except Exception:
+                pass
         json_dir = f"data/{platform}/json"
-        
-
-        # 查找最新的内容文件和评论文件
         contents_file = find_latest_files(json_dir, "search_contents_*.json")
         comments_file = find_latest_files(json_dir, "search_comments_*.json")
-        
-        # 检查文件是否存在
         if not contents_file or not os.path.exists(contents_file):
             return jsonify({
                 "status": "error",
                 "message": "未找到内容数据文件，请确保爬虫已成功执行"
             }), 404
-        
         if not comments_file or not os.path.exists(comments_file):
             return jsonify({
                 "status": "error", 
                 "message": "未找到评论数据文件，请确保爬虫已成功执行"
             }), 404
-        
-        result_data = {"contents": [], "comments": []}
-        
-        # 使用工具函数读取内容数据（前5条）
         contents = read_json_data_with_limit(contents_file)
-        
-        # 使用工具函数读取评论数据（前5条）
         comments = read_json_data_with_limit(comments_file)
-        
         return jsonify({
             "status": "success",
             "platform": platform,

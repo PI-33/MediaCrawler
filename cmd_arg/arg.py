@@ -253,6 +253,22 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
                 rich_help_panel="小红书配置",
             ),
         ] = "",
+        output: Annotated[
+            str,
+            typer.Option(
+                "--output",
+                help="输出模式 (stdout | file)",
+                rich_help_panel="输出配置",
+            ),
+        ] = "file",
+        quiet: Annotated[
+            bool,
+            typer.Option(
+                "--quiet",
+                help="安静模式，减少控制台输出",
+                rich_help_panel="输出配置",
+            ),
+        ] = False,
     ) -> SimpleNamespace:
         """MediaCrawler 命令行入口"""
 
@@ -291,6 +307,8 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
             filter_note_time=filter_note_time,
             max_notes_count=max_notes_count,
             max_comments_count_single_note=max_comments_count_single_note,
+            output=output,
+            quiet=quiet,
         )
 
     command = typer.main.get_command(app)

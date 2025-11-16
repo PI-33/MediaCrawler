@@ -10,6 +10,8 @@
 
 
 import asyncio
+import json
+import logging
 import sys
 from typing import Optional
 
@@ -26,6 +28,7 @@ from media_platform.xhs import XiaoHongShuCrawler
 from media_platform.zhihu import ZhihuCrawler
 from tools import utils
 from tools.async_file_writer import AsyncFileWriter
+from tools.result_collector import enable_memory_output, get_collector, is_memory_output
 from var import crawler_type_var, startup_time_var
 
 
@@ -69,6 +72,13 @@ async def main():
     # parse cmd
     args = await cmd_arg.parse_cmd()
 
+    if getattr(args, "quiet", False):
+        utils.logger.setLevel(logging.WARNING)
+        logging.getLogger("httpx").setLevel(logging.WARNING)
+
+    if getattr(args, "output", "file") == "stdout":
+        enable_memory_output(True)
+
     # init db
     if args.init_db:
         await db.init_db(args.init_db)
@@ -80,17 +90,19 @@ async def main():
     crawler = CrawlerFactory.create_crawler(platform=config.PLATFORM)
     await crawler.start()
 
-    # Generate wordcloud after crawling is complete
-    # Only for JSON save mode
-    if config.SAVE_DATA_OPTION == "json" and config.ENABLE_GET_WORDCLOUD:
-        try:
-            file_writer = AsyncFileWriter(
-                platform=config.PLATFORM,
-                crawler_type=crawler_type_var.get()
-            )
-            await file_writer.generate_wordcloud_from_comments()
-        except Exception as e:
-            print(f"Error generating wordcloud: {e}")
+    if is_memory_output():
+        data = get_collector().dump()
+        print("MC_JSON_START" + json.dumps(data, ensure_ascii=False) + "MC_JSON_END")
+    else:
+        if config.SAVE_DATA_OPTION == "json" and config.ENABLE_GET_WORDCLOUD:
+            try:
+                file_writer = AsyncFileWriter(
+                    platform=config.PLATFORM,
+                    crawler_type=crawler_type_var.get()
+                )
+                await file_writer.generate_wordcloud_from_comments()
+            except Exception as e:
+                print(f"Error generating wordcloud: {e}")
 
 
 def cleanup():

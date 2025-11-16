@@ -4,10 +4,12 @@ playwright==1.45.0
 tenacity==8.2.2
 typer>=0.12.3
 opencv-python
-aiomysql==0.2.0
+# aiomysql==0.2.0
 redis~=4.6.0
 pydantic==2.5.2
 aiofiles~=23.2.1
+Flask==3.0.0
+gunicorn==21.2.0
 fastapi==0.110.2
 uvicorn==0.29.0
 python-dotenv==1.0.1
@@ -21,8 +23,8 @@ pandas==2.2.3
 aiosqlite==0.21.0
 pyhumps==3.8.0
 cryptography>=45.0.7
-alembic>=1.16.5
-asyncmy>=0.2.10
+# alembic>=1.16.5
+# asyncmy>=0.2.10
 sqlalchemy>=2.0.43
 motor>=3.3.0
 xhshow>=0.1.3
