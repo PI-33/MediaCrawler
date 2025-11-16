@@ -26,7 +26,7 @@ from sqlalchemy.orm import sessionmaker
 
 import config
 from base.base_crawler import AbstractStore
-from database.db_session import get_session
+# from database.db_session import get_session
 from database.models import BilibiliVideoComment, BilibiliVideo, BilibiliUpInfo, BilibiliUpDynamic, BilibiliContactInfo
 from tools.async_file_writer import AsyncFileWriter
 from tools import utils, words

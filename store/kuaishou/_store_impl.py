@@ -26,7 +26,7 @@ from sqlalchemy import select
 
 import config
 from base.base_crawler import AbstractStore
-from database.db_session import get_session
+# from database.db_session import get_session
 from database.models import KuaishouVideo, KuaishouVideoComment
 from tools import utils, words
 from var import crawler_type_var

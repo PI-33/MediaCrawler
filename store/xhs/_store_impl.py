@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from base.base_crawler import AbstractStore
-from database.db_session import get_session
+# from database.db_session import get_session
 from database.models import XhsNote, XhsNoteComment, XhsCreator
 
 from tools.async_file_writer import AsyncFileWriter

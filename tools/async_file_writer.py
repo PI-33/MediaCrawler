@@ -8,7 +8,7 @@ import aiofiles
 import config
 from tools.result_collector import get_collector, is_memory_output
 from tools.utils import utils
-from tools.words import AsyncWordCloudGenerator
+# from tools.words import AsyncWordCloudGenerator
 from var import startup_time_var
 
 class AsyncFileWriter:
